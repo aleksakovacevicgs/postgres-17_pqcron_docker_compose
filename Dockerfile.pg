@@ -1,0 +1,15 @@
+FROM postgres:17
+
+# Install build dependencies and pg_cron for PostgreSQL 17
+RUN apt-get update && apt-get install -y \
+    postgresql-server-dev-17 \
+    build-essential \
+    git \
+    && rm -rf /var/lib/apt/lists/* \
+    && git clone https://github.com/citusdata/pg_cron.git \
+    && cd pg_cron \
+    && make && make install
+
+# Enable pg_cron in PostgreSQL config
+RUN echo "shared_preload_libraries = 'pg_cron'" >> /usr/share/postgresql/postgresql.conf.sample
+RUN echo "cron.database_name = 'mydatabase'" >> /usr/share/postgresql/postgresql.conf.sample
